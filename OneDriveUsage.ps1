@@ -13,15 +13,10 @@
   A switch parameter that will cause the example function to ADD content. Add or remove PARAMETERs as required.
 
 .NOTES
-    Updated: 2020-05-25       First File to Github.
-   
+  Updated: 2020-05-25       First File to Github.
   Author: Justin Page
 
 .EXAMPLE
-
-.EXAMPLE 
-
-See Help about_Comment_Based_Help for more .Keywords
 
 #>
 param(
