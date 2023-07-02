@@ -1,0 +1,51 @@
+# Import the Active Directory module
+Import-Module ActiveDirectory
+
+# Define the group name
+$groupName = "IT Staff"
+
+# Get the users in the group
+$users = Get-ADGroupMember -Identity $groupName | Where-Object {$_.objectClass -eq "user"} | Select-Object -ExpandProperty SamAccountName
+
+# Define the output file path
+$outputFile = "C:\\Temp\\RoleGroups.csv"
+
+# Create an empty array to store the output objects
+$output = @()
+
+# Loop through each user
+foreach ($user in $users) {
+    # Get the display name of the user
+    $displayName = (Get-ADUser -Identity $user -Properties DisplayName).DisplayName
+
+    # Get the groups that the user belongs to
+    $groups = Get-ADPrincipalGroupMembership -Identity $user | Select-Object -ExpandProperty Name
+
+    # Filter the groups that begin with Role-
+    $roleGroups = $groups -like "Role-*"
+
+    # Create an empty array to store the role groups and their member counts
+    $roleGroupsWithCount = @()
+
+    # Loop through each role group
+    foreach ($roleGroup in $roleGroups) {
+        # Get the number of members in the role group
+        $memberCount = (Get-ADGroupMember -Identity $roleGroup).Count
+
+        # Add the role group and its member count to the array
+        $roleGroupsWithCount += "$roleGroup ($memberCount)"
+    }
+
+    # Create a custom object with the user, their display name and their role groups with member counts
+    $object = [PSCustomObject]@{
+        User = $user
+        DisplayName = $displayName
+        RoleGroups = $roleGroupsWithCount -join ", "
+    }
+
+    # Add the object to the output array
+    $output += $object
+}
+
+# Export the output array to a CSV file
+$output | Export-Csv -Path $outputFile -NoTypeInformation
