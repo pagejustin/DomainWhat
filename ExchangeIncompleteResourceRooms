@@ -1,0 +1,23 @@
+# Get all the room mailboxes in Exchange
+$rooms = Get-Mailbox -RecipientTypeDetails RoomMailbox
+
+# Create an empty array to store the output
+$output = @()
+
+# Loop through each room mailbox and check its first name and last name
+foreach ($room in $rooms) {
+  # Get the first name and last name of the room mailbox
+  $firstName = $room.GivenName
+  $lastName = $room.Surname
+
+  # If either the first name or the last name is empty, add the identity and displayname of the room mailbox to the output array
+  if ([string]::IsNullOrEmpty($firstName) -or [string]::IsNullOrEmpty($lastName)) {
+    $output += [PSCustomObject]@{
+      Identity = $room.Identity
+      DisplayName = $room.DisplayName
+    }
+  }
+}
+
+# Export the output array to CSV
+$output | Export-Csv -Path "C:\Scripts\Rooms.csv" -NoTypeInformation
